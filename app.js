@@ -1,6 +1,41 @@
-const http = require("http");const host = 'localhost';const port = 3000;const requestListener = function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'}); // Set HTTP status code and header
-  res.end("Hello World!"); // Send the response body and close the connection
-};const server = http.createServer(requestListener);server.listen(port, host, () => {
-  console.log(Server is running on http://host:3000/);
+import { Octokit } from "@octokit/rest";
+
+const octokit = new Octokit({
+    auth: "YOUR_GITHUB_TOKEN"
 });
+
+async function updateFile(){
+
+    // STEP-1: get file info
+    const file = await octokit.repos.getContent({
+
+        owner: "Prince161724",
+        repo: "Test-repo",
+        path: "backend/ksksksk/app.js"
+    });
+
+    const sha = file.data.sha;
+
+    // STEP-2: update file
+    await octokit.repos.createOrUpdateFileContents({
+
+        owner: "Prince161724",
+        repo: "Test-repo",
+
+        path: "backend/ksksksk/app.js",
+
+        message: "update app.js using Octokit",
+
+        content: Buffer.from(
+            'console.log("Updated by Octokit 🔥");'
+        ).toString("base64"),
+
+        sha: sha
+
+    });
+
+    console.log("File updated successfully");
+
+}
+
+updateFile();
